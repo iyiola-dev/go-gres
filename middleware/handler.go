@@ -5,9 +5,6 @@ import (
 	"net/http"
 )
 
-func getBook(w http.ResponseWriter, r *http.Request) {
-	log.Println("get a;; books")
-}
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	log.Println("get a;; books")
 
