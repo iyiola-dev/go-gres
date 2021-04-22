@@ -5,19 +5,23 @@ import (
 	"net/http"
 )
 
-func getBooks(w http.ResponseWriter, r *http.Request) {
+func GetBooks(w http.ResponseWriter, r *http.Request) {
 	log.Println("get a;; books")
 
 }
-func updateBook(w http.ResponseWriter, r *http.Request) {
+func GetBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("get a;; books")
 
 }
-func deleteBook(w http.ResponseWriter, r *http.Request) {
+func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("get a;; books")
 
 }
-func addBook(w http.ResponseWriter, r *http.Request) {
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+	log.Println("get a;; books")
+
+}
+func AddBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("get a;; books")
 
 }

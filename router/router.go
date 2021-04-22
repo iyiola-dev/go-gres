@@ -1,13 +1,16 @@
 package router
 
-import "github.com/gorilla/mux"
+import (
+	"github.com/gorilla/mux"
+	"github.com/iyiola-dev/go-gres/middleware"
+)
 
 func Router() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/books", middleware.getBooks).Methods("GET")
-	router.HandleFunc("/book{id}", middleware.getBook).Methods("GET")
-	router.HandleFunc("/book{id}", middleware.updateBook).Methods("PUT")
-	router.HandleFunc("/book", middleware.addBook()).Methods("post")
-	router.HandleFunc("/book{id}", middleware.deleteBook).Methods("DELETE")
+	router.HandleFunc("/books", middleware.GetBooks).Methods("GET")
+	router.HandleFunc("/book{id}", middleware.GetBook).Methods("GET")
+	router.HandleFunc("/book{id}", middleware.UpdateBook).Methods("PUT")
+	router.HandleFunc("/book", middleware.AddBook).Methods("post")
+	router.HandleFunc("/book{id}", middleware.DeleteBook).Methods("DELETE")
 	return router
 }
