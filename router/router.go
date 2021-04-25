@@ -8,9 +8,9 @@ import (
 func Router() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/books", middleware.GetBooks).Methods("GET")
-	router.HandleFunc("/book{id}", middleware.GetBook).Methods("GET")
-	router.HandleFunc("/book{id}", middleware.UpdateBook).Methods("PUT")
-	router.HandleFunc("/book", middleware.AddBook).Methods("post")
-	router.HandleFunc("/book{id}", middleware.DeleteBook).Methods("DELETE")
+	router.HandleFunc("/book/{id}", middleware.GetBook).Methods("GET")
+	router.HandleFunc("/updatebook", middleware.UpdateBook).Methods("PUT")
+	router.HandleFunc("/addbook", middleware.AddBook).Methods("post")
+	router.HandleFunc("/delbook{id}", middleware.DeleteBook).Methods("DELETE")
 	return router
 }

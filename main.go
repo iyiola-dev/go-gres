@@ -11,6 +11,6 @@ import (
 func main() {
 	route := router.Router()
 	fmt.Println("starting route at one port like that")
-	log.Fatal(http.ListenAndServe(":100000", route))
+	log.Fatal(http.ListenAndServe(":8080", route))
 
 }

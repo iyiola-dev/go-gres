@@ -4,7 +4,5 @@ type Book struct {
 	ID     int    `json:id`
 	Title  string `json:title`
 	Author string `json:Author`
-	Year   string `json:Year`
+	Year   int    `json:Year`
 }
-
-var books []Book
