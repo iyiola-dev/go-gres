@@ -1,18 +1,78 @@
 package middleware
 
 import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/iyiola-dev/go-gres/models"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
-var book []models.Book
+var book models.Book
+
+func LoadDb() *sql.DB {
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("error loading %s", err)
+	} else {
+		log.Println("env loaded")
+	}
+	username := os.Getenv("APP_DB_USERNAME")
+	pass := os.Getenv("APP_DB_PASSWORD")
+	host := os.Getenv("APP_DB_HOST")
+	dbName := os.Getenv("APP_DB_NAME")
+	port := os.Getenv("APP_DB_PORT")
+	connects := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable", host, port, username, pass, dbName)
+	db, err := sql.Open("postgres", connects)
+	checkErr(err)
+	err = db.Ping()
+	checkErr(err)
+	fmt.Println("Successfully connected!")
+
+	return db
+}
 
 func GetBooks(w http.ResponseWriter, r *http.Request) {
+	books := []models.Book{}
+	db := LoadDb()
+	statement := `select * from books`
+	rows, err := db.Query(statement)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+	}
+	for rows.Next() {
+		err := rows.Scan(&book.ID, &book.Author, &book.Title, &book.Year)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+		}
+		books = append(books, book)
+
+	}
+	json.NewEncoder(w).Encode(books)
+
+	defer db.Close()
+	defer rows.Close()
 
 }
 func GetBook(w http.ResponseWriter, r *http.Request) {
-
+	statement := `select * from books where id=$1`
+	db := LoadDb()
+	params := mux.Vars(r)
+	rows := db.QueryRow(statement, params["id"])
+	err := rows.Scan(&book.ID, &book.Author, &book.Title, &book.Year)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+		json.NewEncoder(w).Encode(err)
+	}
+	json.NewEncoder(w).Encode(book)
 }
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 
@@ -23,4 +83,9 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 func AddBook(w http.ResponseWriter, r *http.Request) {
 
+}
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
