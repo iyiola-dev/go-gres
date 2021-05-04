@@ -46,12 +46,12 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	statement := `select * from books`
 	rows, err := db.Query(statement)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
 	}
 	for rows.Next() {
 		err := rows.Scan(&book.ID, &book.Author, &book.Title, &book.Year)
 		if err != nil {
-			fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+			log.Println(fmt.Sprintf("error occurred doing this: %s", err))
 		}
 		books = append(books, book)
 
@@ -69,20 +69,48 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	rows := db.QueryRow(statement, params["id"])
 	err := rows.Scan(&book.ID, &book.Author, &book.Title, &book.Year)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("error occurred doing this: %s", err))
+		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
 		json.NewEncoder(w).Encode(err)
 	}
 	json.NewEncoder(w).Encode(book)
 }
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
 
+	db := LoadDb()
+	defer db.Close()
+	statement := `update books set author=$2, title=$3, year=$4 where id=$1`
+	_, err := db.Exec(statement, params["id"], book.Author, book.Title, book.Year)
+	if err != nil {
+		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
+	}
+	json.NewEncoder(w).Encode("row updated")
 }
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
+	db := LoadDb()
+	defer db.Close()
+	params := mux.Vars(r)
+	statement := `delete from books where id=$1 `
+	_, err := db.Exec(statement, params["id"])
+	if err != nil {
+		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
+	} else {
+		json.NewEncoder(w).Encode("row deleted")
+	}
 
 }
 
 func AddBook(w http.ResponseWriter, r *http.Request) {
-
+	//var bookId int
+	db := LoadDb()
+	json.NewDecoder(r.Body).Decode(&book)
+	defer db.Close()
+	statement := `insert into books(title, author, year) values($1,$2,$3) returning id, author, title, year`
+	err := db.QueryRow(statement, book.Title, book.Author, book.Year).Scan(&book.ID, &book.Author, &book.Title, &book.Year)
+	if err != nil {
+		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
+	}
+	json.NewEncoder(w).Encode(book)
 }
 func checkErr(err error) {
 	if err != nil {
