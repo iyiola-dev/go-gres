@@ -65,14 +65,16 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 func GetBook(w http.ResponseWriter, r *http.Request) {
 	statement := `select * from books where id=$1`
 	db := LoadDb()
+	defer db.Close()
 	params := mux.Vars(r)
 	rows := db.QueryRow(statement, params["id"])
 	err := rows.Scan(&book.ID, &book.Author, &book.Title, &book.Year)
 	if err != nil {
 		log.Println(fmt.Sprintf("error occurred doing this: %s", err))
-		json.NewEncoder(w).Encode(err)
 	}
+
 	json.NewEncoder(w).Encode(book)
+
 }
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -101,7 +103,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddBook(w http.ResponseWriter, r *http.Request) {
-	//var bookId int
+
 	db := LoadDb()
 	json.NewDecoder(r.Body).Decode(&book)
 	defer db.Close()
