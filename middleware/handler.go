@@ -56,8 +56,11 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 		books = append(books, book)
 
 	}
-	json.NewEncoder(w).Encode(books)
-
+	buf, err := json.Marshal(books)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.Write(buf)
 	defer db.Close()
 	defer rows.Close()
 
